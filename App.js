@@ -99,7 +99,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    const interpolations = this.state.dataSource.map((bar, index) => {
+    const interpolations = this.state.dataSource.map((studio, index) => {
       const inputRange = [
         (index - 1) * CARD_WIDTH,
         index * CARD_WIDTH,
@@ -117,6 +117,7 @@ export default class App extends React.Component {
       });
       return { scale, opacity };
     });
+    console.log(this.state.dataSource);
     return (
       <View style={styles.container}>
         <MapView
@@ -134,7 +135,7 @@ export default class App extends React.Component {
           pinColor={'#FF8383'}
           title={"You are here"}
         /> 
-        {this.state.dataSource.map((bar, index) => {
+        {this.state.dataSource.map((studio, index) => {
           const scaleStyle = {
             transform: [
               {
@@ -146,7 +147,7 @@ export default class App extends React.Component {
             opacity: interpolations[index].opacity,
           };
           return (
-            <MapView.Marker key={index} coordinate={bar.coordinates} title={bar.title}>
+            <MapView.Marker key={index} coordinate={studio.coordinates} title={studio.title}>
               <Animated.View style={[styles.markerWrap, opacityStyle]}>
                 <Animated.View style={[styles.ring, scaleStyle]} />
                 <View style={styles.marker} />
@@ -156,41 +157,46 @@ export default class App extends React.Component {
         })}
         </MapView>
         <Animated.ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH}
-        onScroll={Animated.event(
-          [
-            {
-              nativeEvent: {
-                contentOffset: {
-                  x: this.animation,
+          horizontal
+          scrollEventThrottle={1}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={CARD_WIDTH}
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: {
+                    x: this.animation,
+                  },
                 },
               },
-            },
-          ],
-          { useNativeDriver: true }
-        )}
-        style={styles.scrollView}
-        contentContainerStyle={styles.endPadding}
-      >
-        {this.state.dataSource.map((bar, index) => (
+            ],
+            { useNativeDriver: true }
+          )}
+          style={styles.scrollView}
+          contentContainerStyle={styles.endPadding}
+        >
+        {this.state.dataSource.map((studio, index) => (
           <View style={styles.card} key={index}>
             <Image
-              source={{uri: bar.image_url}}
+              source={{uri: studio.image_url || 'https://d30y9cdsu7xlg0.cloudfront.net/png/466088-200.png' }}
               style={styles.cardImage}
               resizeMode="cover"
             />
             <View style={styles.textContent}>
-              <Text numberOfLines={1} style={styles.cardtitle}>{bar.name}</Text>
-              <Text numberOfLines={2} style={styles.cardDescription}>
-                {bar.categories[0].title}
-              </Text>
+              <Text numberOfLines={1} style={styles.cardtitle}>{studio.name}</Text>
+              <Text numberOfLines={1} style={styles.cardDescription}>{studio.categories[0].title}</Text>
+              <Text numberOfLines={1} style={styles.cardDescription}>{studio.location.city}, {studio.location.state}</Text>
             </View>
           </View>
         ))}
       </Animated.ScrollView>
+      <View style={styles.footer}>
+        <Image
+          source={require('./assets/Yelp_trademark_RGB_outline.png')}
+          style={styles.yelp}
+        />
+      </View>
       </View>
     );
   }
@@ -213,8 +219,9 @@ const styles = StyleSheet.create({
   card: {
     padding: 10,
     elevation: 2,
-    backgroundColor: "#FFF",
+    backgroundColor: "rgba(2555,2555,2555,0.7)",
     marginHorizontal: 10,
+    borderRadius: 8,
     shadowColor: "#000",
     shadowRadius: 5,
     shadowOpacity: 0.3,
@@ -236,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
     fontWeight: "bold",
+    color: 'rgba(243,107,117, 0.9)'
   },
   cardDescription: {
     fontSize: 12,
@@ -259,5 +267,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderWidth: 1,
     borderColor: "rgba(243,107,117, 0.5)",
+  },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  yelp: {
+    width: 50,
+    height: 20
   },
 });
