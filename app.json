@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "rn-map",
-    "description": "An empty new project",
-    "slug": "rn-map",
+    "name": "fitness-finder",
+    "description": "RN-Map",
+    "slug": "fitness-finder",
     "privacy": "public",
     "sdkVersion": "19.0.0",
     "version": "1.0.0",

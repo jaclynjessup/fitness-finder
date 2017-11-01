@@ -70,6 +70,24 @@ export default class App extends React.Component {
       }, 10);
     });
   }
+
+  getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    // console.log(lat1,lon1,lat2,lon2)
+    var R = 6371; // Radius of the earth in km
+    var dLat = this.deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = this.deg2rad(lon2-lon1);
+    var a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c; // Distance in km
+    return Math.round(d*1000); //Distance in meters
+  }
+  deg2rad(deg) {
+    return deg * (Math.PI/180)
+  }
   
   onRegionChange(region) {
     this.setState({ region });
@@ -117,7 +135,6 @@ export default class App extends React.Component {
       });
       return { scale, opacity };
     });
-    console.log(this.state.dataSource);
     return (
       <View style={styles.container}>
         <MapView
@@ -150,7 +167,10 @@ export default class App extends React.Component {
             <MapView.Marker key={index} coordinate={studio.coordinates} title={studio.title}>
               <Animated.View style={[styles.markerWrap, opacityStyle]}>
                 <Animated.View style={[styles.ring, scaleStyle]} />
-                <View style={styles.marker} />
+                <Image
+                  source={{uri: 'https://d30y9cdsu7xlg0.cloudfront.net/png/466088-200.png' }}
+                  style={styles.pin}
+                />
               </Animated.View>
             </MapView.Marker>
           );
@@ -185,8 +205,10 @@ export default class App extends React.Component {
             />
             <View style={styles.textContent}>
               <Text numberOfLines={1} style={styles.cardtitle}>{studio.name}</Text>
-              <Text numberOfLines={1} style={styles.cardDescription}>{studio.categories[0].title}</Text>
+              <Text numberOfLines={1} style={styles.cardCategory}>{studio.categories[0].title}</Text>
+              <Text numberOfLines={1} style={styles.cardDescription}>{studio.location.address1}</Text>
               <Text numberOfLines={1} style={styles.cardDescription}>{studio.location.city}, {studio.location.state}</Text>
+              <Text numberOfLines={1} style={styles.cardDistance}>{this.getDistanceFromLatLonInKm(studio.coordinates.latitude, studio.coordinates.longitude, this.state.position.coords.latitude, this.state.position.coords.longitude)} meters away</Text>
             </View>
           </View>
         ))}
@@ -219,21 +241,22 @@ const styles = StyleSheet.create({
   card: {
     padding: 10,
     elevation: 2,
-    backgroundColor: "rgba(2555,2555,2555,0.7)",
+    backgroundColor: "rgba(2555,2555,2555,0.8)",
     marginHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowRadius: 5,
     shadowOpacity: 0.3,
-    shadowOffset: { x: 2, y: -2 },
+    shadowOffset: { x: 4, y: -4 },
     height: CARD_HEIGHT,
     width: CARD_WIDTH,
     overflow: "hidden",
   },
   cardImage: {
-    flex: 3,
+    flex: 2,
     width: "100%",
-    height: "100%",
+    height: "75%",
+    borderRadius: 10,
     alignSelf: "center",
   },
   textContent: {
@@ -249,23 +272,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#444",
   },
+  cardDistance: {
+    fontStyle: 'italic',
+    fontSize: 12,
+    color: "#444",
+    fontWeight: '300'
+  },
+  cardCategory: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "rgba(243,107,117, 0.5)"
+  },
   markerWrap: {
     alignItems: "center",
     justifyContent: "center",
   },
-  marker: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "rgba(243,107,117, 0.9)",
+  pin: {
+    width: 25,
+    height: 25,
   },
   ring: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: "rgba(243,107,117, 0.3)",
     position: "absolute",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "rgba(243,107,117, 0.5)",
   },
   footer: {
